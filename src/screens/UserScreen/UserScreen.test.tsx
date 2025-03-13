@@ -1,15 +1,15 @@
 // src/screens/UserScreen/UserScreen.test.tsx
 import React from 'react';
-import {render, fireEvent} from '@testing-library/react-native';
-import {MockedProvider} from '@apollo/client/testing';
+import { render, fireEvent } from '@testing-library/react-native';
+import { MockedProvider } from '@apollo/client/testing';
 import UserScreen from './UserScreen';
-import {LIST_ZELLER_CUSTOMERS} from '../../graphql/queries';
+import { LIST_ZELLER_CUSTOMERS } from '../../graphql/queries';
 
 const mocks = [
   {
     request: {
       query: LIST_ZELLER_CUSTOMERS,
-      variables: {filter: {role: {eq: 'Admin'}}},
+      variables: { filter: { role: { eq: 'Admin' } } },
     },
     result: {
       data: {
@@ -27,11 +27,32 @@ const mocks = [
       },
     },
   },
+  {
+    request: {
+      query: LIST_ZELLER_CUSTOMERS,
+      variables: { filter: { role: { eq: 'Manager' } } },
+    },
+    result: {
+      data: {
+        listZellerCustomers: {
+          items: [
+            {
+              id: '2',
+              name: 'Jane Doe',
+              email: 'jane@example.com',
+              role: 'Manager',
+            },
+          ],
+          nextToken: null,
+        },
+      },
+    },
+  },
 ];
 
 describe('UserScreen', () => {
   it('renders users after fetching', async () => {
-    const {findByText} = render(
+    const { findByText } = render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <UserScreen />
       </MockedProvider>,
@@ -41,12 +62,14 @@ describe('UserScreen', () => {
   });
 
   it('switches role filter', async () => {
-    const {getByText} = render(
+    const { getByText, findByText } = render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <UserScreen />
       </MockedProvider>,
     );
     fireEvent.press(getByText('Manager'));
     expect(getByText('Manager Users')).toBeTruthy();
+    const managerName = await findByText('Jane Doe');
+    expect(managerName).toBeTruthy();
   });
 });
