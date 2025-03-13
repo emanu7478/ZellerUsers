@@ -1,12 +1,27 @@
 import React, {useState} from 'react';
-import {View, Text, ActivityIndicator, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  TextInput,
+} from 'react-native';
 import RadioButton from '../../components/RadioButton/RadioButton';
 import UserList from '../../components/UserList/UserList';
 import {useUsers} from '../../hooks/useUsers';
 
 const UserScreen: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<string>('Admin');
-  const {users, loading, error} = useUsers(selectedRole);
+  const [searchQuery, setSearchQuery] = useState('');
+  const {users, loading, error, refetch} = useUsers(selectedRole);
+
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+
+  const handleRefresh = async () => {
+    await refetch({filter: {role: {eq: selectedRole}}});
+  };
 
   return (
     <View style={styles.container}>
@@ -24,13 +39,19 @@ const UserScreen: React.FC = () => {
         />
       </View>
       <View style={styles.section}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by name..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
         <Text style={styles.header}>{selectedRole} Users</Text>
         {loading ? (
           <ActivityIndicator size="large" color="#0057FF" testID="loading" />
         ) : error ? (
           <Text style={styles.errorText}>Error: {error.message}</Text>
-        ) : users.length > 0 ? (
-          <UserList users={users} />
+        ) : filteredUsers.length > 0 ? (
+          <UserList users={filteredUsers} onRefresh={handleRefresh} />
         ) : (
           <Text style={styles.noUsersText}>No users found</Text>
         )}
@@ -46,6 +67,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#000000',
+    marginBottom: 10,
+  },
+  searchInput: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 5,
+    padding: 10,
     marginBottom: 10,
   },
   errorText: {color: 'red', textAlign: 'center', marginTop: 20},
