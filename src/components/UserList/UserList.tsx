@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {FlatList, StyleSheet, RefreshControl} from 'react-native';
+import {FlatList, RefreshControl } from 'react-native';
 import {ZellerCustomer} from '../../types/user';
 import UserItem from '../UserItem/UserItem';
 
@@ -18,20 +18,15 @@ const UserList: React.FC<UserListProps> = ({users, onRefresh}) => {
   };
 
   return (
-    <FlatList
-      data={users}
-      keyExtractor={item => item.id}
-      renderItem={({item}) => <UserItem user={item} />}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-      }
-      style={styles.list}
-    />
+      <FlatList
+        data={users}
+        keyExtractor={item => item.id}
+        renderItem={({item}) => <UserItem user={item} />}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        }
+      />
   );
 };
-
-const styles = StyleSheet.create({
-  list: {flex: 1},
-});
 
 export default UserList;

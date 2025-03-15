@@ -15,9 +15,10 @@ const UserScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const {users, loading, error, refetch} = useUsers(selectedRole);
 
-  const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+
+  const filteredUsers = users
+  .filter(user => user.role === selectedRole)
+  .filter(user => user.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const handleRefresh = async () => {
     await refetch({filter: {role: {eq: selectedRole}}});
