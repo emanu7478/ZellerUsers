@@ -3,7 +3,7 @@ import { setContext } from '@apollo/client/link/context';
 import awsconfig from '../../aws-exports';
 
 const httpLink = createHttpLink({
-  uri: awsconfig.aws_appsync_graphqlEndpoint,
+  uri: 'http://localhost:9002/graphql',
 });
 
 const authLink = setContext((_, { headers }) => {
